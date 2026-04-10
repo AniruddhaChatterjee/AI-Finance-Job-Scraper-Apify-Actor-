@@ -1,22 +1,19 @@
-import OpenAI from 'openai';
-
-const client = new OpenAI({
-    apiKey: process.env.OPENAI_API_KEY
-});
-
 export async function enrichJobs(jobs) {
     const enriched = [];
 
     for (const job of jobs) {
         const prompt = `
-        Classify this finance job:
+        Extract structured data from this job:
+
         ${job.description}
 
-        Return:
-        - category
-        - seniority
-        - key skills
-        - short summary
+        Return ONLY JSON:
+        {
+          "category": "",
+          "seniority": "",
+          "skills": [],
+          "summary": ""
+        }
         `;
 
         const response = await client.chat.completions.create({
@@ -24,11 +21,16 @@ export async function enrichJobs(jobs) {
             messages: [{ role: "user", content: prompt }]
         });
 
-        const aiData = response.choices[0].message.content;
+        let aiData;
+        try {
+            aiData = JSON.parse(response.choices[0].message.content);
+        } catch {
+            aiData = {};
+        }
 
         enriched.push({
             ...job,
-            ai_insights: aiData
+            ...aiData
         });
     }
 
