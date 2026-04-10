@@ -1,21 +1,34 @@
-import axios from 'axios';
+import { Actor } from 'apify';
 import { parseJobs } from './parser.js';
 import { enrichJobs } from './aiEnrichment.js';
 
 export async function scrapeJobs(input) {
-    const { keywords, locations } = input;
+    const { keywords = [], locations = ["India"], max_results = 50 } = input;
 
     let allJobs = [];
 
+    // 🔹 Loop through keywords
     for (const keyword of keywords) {
-        const url = `https://example-job-api.com/search?q=${keyword}`;
+        console.log(`Scraping jobs for: ${keyword}`);
 
-        const response = await axios.get(url);
-        const parsed = parseJobs(response.data);
+        // Call Apify LinkedIn Jobs Scraper
+        const run = await Actor.call("apify/linkedin-jobs-scraper", {
+            keywords: keyword,
+            location: locations[0],
+            maxItems: max_results
+        });
 
-        allJobs.push(...parsed);
+        const jobs = run.dataset?.items || [];
+
+        // 🔹 Optional parsing layer (clean structure)
+        const parsedJobs = parseJobs(jobs);
+
+        allJobs.push(...parsedJobs);
     }
 
+    console.log(`Total jobs scraped: ${allJobs.length}`);
+
+    // 🔹 AI Enrichment
     const enrichedJobs = await enrichJobs(allJobs);
 
     return enrichedJobs;
