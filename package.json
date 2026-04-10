@@ -7,9 +7,9 @@
     "start": "node main.js"
   },
   "dependencies": {
-    "apify": "^3.0.0",
-    "axios": "^1.6.0",
-    "cheerio": "^1.0.0",
-    "openai": "^4.0.0"
-  }
+  "apify": "^3.0.0",
+  "axios": "^1.6.0",
+  "cheerio": "^1.0.0",
+  "openai": "^4.0.0"
+}
 }
