@@ -1,0 +1,9 @@
+{
+  "type": "object",
+  "properties": {
+    "job_title": { "type": "string" },
+    "company": { "type": "string" },
+    "location": { "type": "string" },
+    "ai_insights": { "type": "string" }
+  }
+}
